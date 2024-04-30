@@ -1,0 +1,20 @@
+{
+  "name": "beiboot-projekt",
+  "version": "1.0.0",
+  "description": "Creating single frames from a video and combining them into a photo with long exposure",
+  "main": "index.js",
+  "module": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node server.js"
+  },
+  "author": "lioba",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "jimp": "^0.22.12",
+    "sharp": "^0.33.3"
+  }
+}
