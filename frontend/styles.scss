@@ -1,11 +1,196 @@
-.upload {
-    background-color: lightblue;
-    width: 300px;
-    height: 2rem;
+:root {
+    --swiper-pagination-bottom: -1rem;
+    --swiper-pagination-bullet-inactive-color: #ffffff;
+    --swiper-pagination-color: #00bfff;
+    --swiper-navigation-color: #00bfff;
 }
 
-.download {
-    background-color: darkorange;
-    width: 300px;
-    height: 2rem;
+body {
+    background: #212121;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+h1 {
+    margin-top: 2rem;
+}
+
+.upload {
+    position: relative;
+    display: flex;
+    height: fit-content;
+    width: 100%;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 4rem;
+}
+
+.center {
+    margin: auto;
+}
+
+input[type="number"],
+input[type="text"] {
+    background: transparent;
+    border: 1px solid #00bfff;
+    color: #ffffff;
+    font-family: sans-serif;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 200px;
+}
+
+input[type="file"]{
+    opacity: 0;
+    z-index: -1;
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 0.1px;
+    height: 0.1px;
+}
+
+label {
+    padding-top: 1rem;
+    color: #FFFFFF;
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+label[for="video-upload"]{
+    background: transparent;
+    border: 1px dashed #00bfff;
+    padding: 10px;
+    color: #00bfff;
+    font-family: sans-serif;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 200px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+
+    span {
+        width: fit-content;
+        margin: 0 auto;
+    }
+}
+
+label[for="video-upload"]:hover{
+    background: #00bfff;
+    color: #fff;
+}
+
+
+input[type="file"]:focus + label[for="video-upload"],
+label[for="video-upload"].file-uploaded {
+    border: 1px solid #8d258e;
+    background: #8d258e;
+    color: #fff;
+}
+
+.submit {
+    background: #00bfff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+}
+
+.submit:hover {
+    background: #8d258e;
+    cursor: pointer;
+}
+
+.generated-frames-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4rem;
+}
+
+.swiper-container {
+    width: calc(100% - 8rem);
+    margin: 0 4rem 2rem 4rem;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.swiper-container .swiper-wrapper {
+    height: auto;
+}
+
+.swiper-container.swiper-horizontal .swiper-pagination {
+    position: relative;
+    top: 0;
+    bottom: 0;
+    margin-top: 1.5rem;
+    left: -0.5rem;
+    width: calc(100% + 1rem);
+}
+
+.swiper-navigation {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    height: fit-content;
+    left: 0;
+}
+
+
+.frame, .combined-image {
+    max-width: 300px; 
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    cursor: pointer;
+    position: absolute;
+    color: white;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid white;
+    border-radius: 4px;
+    display: grid;
+    place-content: center;
+    transform: translateY(-0.075em);
+}
+
+input[type="checkbox"]::before {
+    content: "";
+    background-color: #8d258e;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 4px;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+}
+
+input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+.selected-frames-label {
+    margin-bottom: 1rem;
+}
+
+.selected-frames-input {
+    margin-bottom: 2rem;
+}
+
+.combined-image-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
 }

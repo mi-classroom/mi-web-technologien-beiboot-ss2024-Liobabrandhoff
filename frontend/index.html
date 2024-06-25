@@ -1,13 +1,65 @@
 <html lang="DE">
     <head>
         <title>Beiboot-Projekt</title>
-        <!--link rel="stylesheet" href="/styles.css"-->
+        <link rel="stylesheet" href="styles.scss">
+
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="app.js" defer></script>
+
+        <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     </head>
     <body>
-        <h1>Überschrift</h1>
 
-        <div class="upload"></div>
+        <h1>Bilder mit Langzeitbelichtung aus Videos erstellen</h1>
 
-        <div class="download"></div>
+        <div id="app">
+            <div class="upload">
+                <input class="upload-input center" id="video-upload" type="file" @change="handleFileUpload" required>
+                <label for="video-upload" :class="{ 'file-uploaded': selectedFile }">
+                    <span>{{ selectedFile ? selectedFile.name : 'Datei hochladen' }}</span>
+                </label>
+
+                <label class="center" for="project-name-input">Projektname</label>
+                <input class="project-name-input center" id="project-name-input" type="text" v-model="projectName" required>
+
+                <label class="center" for="fps-input">FPS (Frames per Second)</label>
+                <input class="fps-input center" id="fps-input" type="number" v-model="fps" min="1" required>
+
+                <button @click="generate" class="submit center">Frames generieren</button>
+            </div>
+
+            <div class="generated-frames-container" v-if="generatedFrames && generatedFrames.length > 0">
+                <h2>Generierte Frames:</h2>
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" v-for="(frame, index) in generatedFrames" :key="index">
+                            <input class="frame-checkbox" type="checkbox" v-model="selectedFrames" :value="frame">
+                            <img class="frame" :src="frame" alt="Frame">
+                            <div class="frame-number">{{ index + 1 }}</div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-pagination"></div>
+                </div>
+
+                <div class="swiper-navigation">
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+
+                <label class="selected-frames-label center" for="frame-input">Ausgewählte Frames</label>
+                <input class="selected-frames-input center" id="frame-input" type="text" v-model="frameInput" @blur="updateSelectedFrames" @keypress.enter="updateSelectedFrames">
+
+                <button @click="processSelectedFrames" class="submit center" v-if="selectedFrames.length > 0">Kombiniertes Foto generieren</button>
+
+            </div>
+
+            <div class="combined-image-container" v-if="combinedImageUrl">
+                <h2>Kombiniertes Bild:</h2>
+                <img class="combined-image center" :src="combinedImageUrl" alt="Kombiniertes Bild" width="300">
+            </div>
+        </div>
+
     </body>
 </html>

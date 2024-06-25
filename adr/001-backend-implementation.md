@@ -13,7 +13,7 @@ In dem Beiboot-Projekt soll ein Video hochgeladen werden können, aus dem ein Fo
 
 - Node.js
 - ffmpeg
-- Jimp / Sharp / Magickwand (Auswahl des Bildbearbeitungstools im Detail: [0002 - Image editing tools](0002-image-editing-tools.md))
+- Jimp / Sharp / Magickwand (Auswahl des Bildbearbeitungstools im Detail: [002 - Image editing tools](002-image-editing-tools.md))
 
 ## Decision
 
@@ -59,4 +59,4 @@ Bei der Entwicklung meines Backends habe ich JavaScript, Node.js, ffmpeg und Jim
 
 ### Jimp
 
-Weiteres zu Jimp unter: [0002 - Image editing tools](0002-image-editing-tools.md)
+Weiteres zu Jimp unter: [002 - Image editing tools](002-image-editing-tools.md)

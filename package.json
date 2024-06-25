@@ -4,6 +4,7 @@
   "description": "Creating single frames from a video and combining them into a photo with long exposure",
   "main": "index.js",
   "module": "server.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node server.js"
@@ -11,10 +12,14 @@
   "author": "lioba",
   "license": "ISC",
   "dependencies": {
+    "@primevue/themes": "^4.0.0-rc.1",
+    "body-parser": "^1.20.2",
     "express": "^4.19.2",
     "ffmpeg-static": "^5.2.0",
     "fluent-ffmpeg": "^2.1.2",
     "jimp": "^0.22.12",
-    "sharp": "^0.33.3"
+    "multer": "^1.4.5-lts.1",
+    "primevue": "^4.0.0-rc.1",
+    "swiper": "^11.1.4"
   }
 }

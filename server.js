@@ -1,31 +1,26 @@
-const ffmpegStatic = require('ffmpeg-static');
-const ffmpeg = require('fluent-ffmpeg');
-//const sharp = require('sharp');
-const fs = require('fs');
-const Jimp = require('jimp');
-const path = require('path');
-const express = require("express");
+import express from 'express';
+import videoToFramesRoute from './videoToFrames.js'
 
 const app = express();
-
 const port = 8000;
 
 app.use(express.static("frontend"));
+app.use('/api', videoToFramesRoute);
 
 app.listen(port, () => {
     console.log("app listen on port", port)
 })
 
 
-app.post('/extractFrames', (req, res) => {
-    res.send('Hello World!');
+app.post('/', (req, res) => {
+    console.log("Hello World")
 });
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-app.get('/video-to-frames', async (req, res) => {
+/*app.get('/video-to-frames', async (req, res) => {
 
     // Tell fluent-ffmpeg where it can find FFmpeg
     ffmpeg.setFfmpegPath(ffmpegStatic);
@@ -80,7 +75,7 @@ app.get('/video-to-frames', async (req, res) => {
                         // Erstelle das kombinierte Bild
                         const combinedImage = images.reduce((prev, current) => prev.composite(current, 0, 0), images.shift());
                         console.log('Alle Bilder erfolgreich reduziert und kombiniert.');
-                        return combinedImage.writeAsync('combined_image.png');
+                        return combinedImage.writeAsync('combined_image3.png');
                     })
                     .catch(err => {
                         console.error('Fehler beim Bearbeiten der Bilder:', err);
@@ -109,7 +104,7 @@ app.get('/video-to-frames', async (req, res) => {
                     }
                 });
 
-            ================== */
+            ==================
 
         })
 
@@ -117,4 +112,4 @@ app.get('/video-to-frames', async (req, res) => {
         .on('error', (error) => {
             console.error(error);
         });
-});
+});*/
