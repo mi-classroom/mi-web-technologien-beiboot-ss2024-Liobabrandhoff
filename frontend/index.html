@@ -51,6 +51,9 @@
                 <label class="selected-frames-label center" for="frame-input">Ausgewählte Frames</label>
                 <input class="selected-frames-input center" id="frame-input" type="text" v-model="frameInput" @blur="updateSelectedFrames" @keypress.enter="updateSelectedFrames">
 
+                <label class="highlight-frames-label center" for="highlight-frame-input">Highlight Frames</label>
+                <input class="highlight-frames-input center" id="highlight-frame-input" type="text" v-model="highlightFrames">
+
                 <button @click="processSelectedFrames" class="submit center" v-if="selectedFrames.length > 0">Kombiniertes Foto generieren</button>
 
             </div>

@@ -7,6 +7,7 @@ new Vue({
         generatedFrames: [],
         selectedFrames: [],
         frameInput: '',
+        highlightFrames: [],
         combinedImageUrl: ''
     },
     methods: {
@@ -103,11 +104,17 @@ new Vue({
             try {
                 const formData = new FormData();
                 formData.append('projectName', this.projectName);
-                await Promise.all(this.selectedFrames.map(async (frame, index) => {
+                const highlightFrames = this.highlightFrames.split(',').map(Number);
+
+                //await Promise.all(this.selectedFrames.map(async (frame, index) => {
+                await Promise.all(this.generatedFrames.map(async (frame, index) => {
                     const response = await fetch(frame);
                     const blob = await response.blob();
                     formData.append('images', blob, `frame-${index}.png`);
                 }));
+
+                formData.append('highlightFrames', JSON.stringify(highlightFrames)); // highlightFrames als JSON-String hinzufügen
+                formData.append('selectedFrames', JSON.stringify(this.selectedFrames.map(frame => this.generatedFrames.indexOf(frame) + 1))); // selectedFrames als JSON-String hinzufügen
 
                 const response = await fetch('/api/combine', {
                     method: 'POST',

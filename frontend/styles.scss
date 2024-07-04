@@ -37,12 +37,12 @@ h1 {
 input[type="number"],
 input[type="text"] {
     background: transparent;
-    border: 1px solid #00bfff;
+    border: 1px solid #55ccf3;
     color: #ffffff;
     font-family: sans-serif;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1.15rem;
     width: 200px;
 }
 
@@ -60,20 +60,20 @@ label {
     padding-top: 1rem;
     color: #FFFFFF;
     font-family: sans-serif;
-    font-size: 16px;
+    font-size: 1.15rem;
 }
 
 label[for="video-upload"]{
     background: transparent;
-    border: 1px dashed #00bfff;
+    border: 1px dashed #55ccf3;
     padding: 10px;
-    color: #00bfff;
+    color: #55ccf3;
     font-family: sans-serif;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
-    width: 200px;
-    height: 100px;
+    font-size: 1.15rem;
+    width: 400px;
+    height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -86,28 +86,31 @@ label[for="video-upload"]{
 }
 
 label[for="video-upload"]:hover{
-    background: #00bfff;
+    background: #55ccf3;
     color: #fff;
 }
 
 
 input[type="file"]:focus + label[for="video-upload"],
 label[for="video-upload"].file-uploaded {
-    border: 1px solid #8d258e;
-    background: #8d258e;
+    border: 1px solid #00bfff;
+    background: #00bfff;
     color: #fff;
 }
 
 .submit {
-    background: #00bfff;
+    background: #55ccf3;
     color: #fff;
     border: none;
     border-radius: 8px;
     padding: 0.5rem 1rem;
+    font-size: 1rem;
+    margin-top: 1rem;
 }
 
 .submit:hover {
-    background: #8d258e;
+    background: #00bfff;
+    color: #FFFFFF;
     cursor: pointer;
 }
 
@@ -147,8 +150,8 @@ label[for="video-upload"].file-uploaded {
 }
 
 
-.frame, .combined-image {
-    max-width: 300px; 
+.frame {
+    max-width: 300px;
     margin-bottom: 10px;
     border-radius: 8px;
 }
@@ -193,4 +196,10 @@ input[type="checkbox"]:checked::before {
     display: flex;
     flex-direction: column;
     margin-bottom: 2rem;
+}
+
+.combined-image {
+    width: 600px;
+    margin-bottom: 10px;
+    border-radius: 8px;
 }
