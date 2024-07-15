@@ -16,3 +16,4 @@
 | #1 | [Kernfunktion im Backend erstellen](https://github.com/mi-classroom/mi-master-wt-beiboot-2024/issues/1) | ca. 8 Std. 15 Min. |
 | #2 | [Bildauswahl ermöglichen](https://github.com/mi-classroom/mi-master-wt-beiboot-2024/issues/2)           | ca. 15 Std.        |
 | #3 | [Schlüsselbilder auswählen](https://github.com/mi-classroom/mi-master-wt-beiboot-2024/issues/3)         | ca. 5 Std. 15 Min. |
+| #3 | [Docker einbinden](https://github.com/mi-classroom/mi-master-wt-beiboot-2024/issues/4)                  | tbd                |
