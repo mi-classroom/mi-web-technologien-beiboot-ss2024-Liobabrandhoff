@@ -15,9 +15,11 @@ Hier ein paar ADR Beispiele aus dem letzten Semestern:
 
 Halten Sie die Anwendung, gerade in der Anfangsphase möglichst einfach, schlank und leichtgewichtig (KISS).
 
+# Team
+Autor: [Lioba Brandhoff](https://github.com/Liobabrandhoff) \
+Reviewer: [Jona Dielmann](https://github.com/jona-d01)
 
-
-# Projekt Dokumentation
+# Projekt Dokumentation & Zeitaufwand
 
 [Architectural Decision Records](adr/README.md)
 
@@ -46,7 +48,7 @@ npm start
 
 #### Ausführung
 ```shell
-docker run -p 8000:8000 --name beiboot-projekt -d docker run -d beiboot-projekt
+docker run -p 8000:8000 --name beiboot-projekt -d beiboot-projekt
 ```
 
 
