@@ -15,8 +15,41 @@ Hier ein paar ADR Beispiele aus dem letzten Semestern:
 
 Halten Sie die Anwendung, gerade in der Anfangsphase möglichst einfach, schlank und leichtgewichtig (KISS).
 
+# Team
+Autor: [Lioba Brandhoff](https://github.com/Liobabrandhoff) \
+Reviewer: [Jona Dielmann](https://github.com/jona-d01)
 
-
-# Projekt Dokumentation
+# Projekt Dokumentation & Zeitaufwand
 
 [Architectural Decision Records](adr/README.md)
+
+
+# Lokale Ausführung
+Für die lokale Ausführung dieses Projekts muss [Node.js](https://nodejs.org/en/download/prebuilt-installer) oder [Docker](https://www.docker.com/) installiert sein
+
+## Ausführung mit Node.js
+### Installation
+```sh
+npm install
+```
+
+### Ausführung
+```sh
+npm start
+```
+
+## Ausführung mit Docker
+
+
+#### Installation
+```shell
+ docker build -t beiboot-projekt .
+```
+
+#### Ausführung
+```shell
+docker run -p 8000:8000 --name beiboot-projekt -d beiboot-projekt
+```
+
+
+Die Anwendung kann nach erfolgreicher Ausführung unter http://localhost:8000 im Browser aufgerufen werden.
