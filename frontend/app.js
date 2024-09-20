@@ -1,16 +1,53 @@
 new Vue({
     el: '#app',
     data: {
-        selectedFile: null,
-        projectName: '',
-        fps: 10, // Standardwert
-        generatedFrames: [],
-        selectedFrames: [],
-        frameInput: '',
-        highlightFrames: [],
-        combinedImageUrl: ''
+        step: 1, // Schritt-Status
+        steps: ['Datei hochladen', 'Frames auswählen', 'Frames hervorheben', 'Bild generieren'], // Schritte-Array
+        selectedFile: null, //ausgewählte Datei
+        projectName: '', //Projektname
+        fps: 10, // Standardwert der fps
+        generatedFrames: [], //generierte Frames
+        selectedFrames: [], //ausgewählte Frames
+        frameInput: '', //ausgewählte Frames im InputFeld
+        getSelectedFrames: [], //alle ausgewählten Frames zur Weiterverarbeitung fürs Highlighten
+        originalIndices: [], // Originale Indizes der ausgewählten Frames
+        highlightFrames: [], //Frames, die gehighlighted werden sollen
+        highlightInput: '', //Frames, die gehighlighted werden sollen im InputFeld
+        highlightOpacity: 0.6, // Neue Opacity für die hervorgehobenen Frames
+        combinedImageUrl: '' //kombiniertes Bild
     },
     methods: {
+        nextStep() {
+            if (this.step === 2 && !this.selectedFrames.length) {
+                alert('Bitte wählen Sie mindestens einen Frame aus.');
+                return;
+            }
+            if (this.step < this.steps.length) {
+                this.step++;
+            }
+
+            // Initialize Swiper when moving to step 3
+            if (this.step === 3) {
+                this.$nextTick(() => {
+                    if (this.swiper) {
+                        this.swiper.destroy(true, true);
+                    }
+                    this.swiper = new Swiper('.swiper-container', {
+                        slidesPerView: 3,
+                        spaceBetween: 16,
+                        slidesPerGroup: 3,
+                        pagination: {
+                            el: '.swiper-pagination',
+                            clickable: true,
+                        },
+                        navigation: {
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev',
+                        },
+                    });
+                });
+            }
+        },
         handleFileUpload(event) {
             this.selectedFile = event.target.files[0];
         },
@@ -51,6 +88,10 @@ new Vue({
                         .then(response => response.json())
                         .then(data => {
                             this.generatedFrames = data.imageUrls;
+
+                            if (this.step < this.steps.length) {
+                                this.step++;
+                            }
                         })
                         .catch(error => {
                             console.error('Fehler bei der Generierung:', error);
@@ -60,29 +101,28 @@ new Vue({
                     console.error('Fehler beim Hochladen der Datei:', error);
                 });
         },
-        updateFrameInput() {
-            const selectedIndices = this.selectedFrames.map(frame => {
-                return this.generatedFrames.indexOf(frame) + 1;
-            }).sort((a, b) => a - b);
-
+        // Hilfsfunktion zum Erstellen eines Bereichsstrings aus Indizes
+        indicesToRangeString(indices) {
+            indices.sort((a, b) => a - b);
             let ranges = [];
-            let rangeStart = selectedIndices[0];
+            let rangeStart = indices[0];
 
-            for (let i = 1; i <= selectedIndices.length; i++) {
-                if (selectedIndices[i] !== selectedIndices[i - 1] + 1) {
-                    if (rangeStart === selectedIndices[i - 1]) {
+            for (let i = 1; i <= indices.length; i++) {
+                if (indices[i] !== indices[i - 1] + 1) {
+                    if (rangeStart === indices[i - 1]) {
                         ranges.push(rangeStart.toString());
                     } else {
-                        ranges.push(`${rangeStart}-${selectedIndices[i - 1]}`);
+                        ranges.push(`${rangeStart}-${indices[i - 1]}`);
                     }
-                    rangeStart = selectedIndices[i];
+                    rangeStart = indices[i];
                 }
             }
-
-            this.frameInput = ranges.join(', ');
+            return ranges.join(', ');
         },
-        updateSelectedFrames() {
-            const frameRanges = this.frameInput.split(',').map(range => range.trim());
+
+        // Hilfsfunktion zum Umwandeln eines Bereichsstrings in eine Liste von Indizes
+        rangeStringToIndices(rangeString) {
+            const frameRanges = rangeString.split(',').map(range => range.trim());
             let indices = [];
 
             frameRanges.forEach(range => {
@@ -98,23 +138,89 @@ new Vue({
                 }
             });
 
-            this.selectedFrames = this.generatedFrames.filter((_, index) => indices.includes(index + 1));
+            return indices;
         },
+
+        updateFrameInput() {
+            const selectedIndices = this.selectedFrames.map(frame => {
+                return this.generatedFrames.indexOf(frame) + 1;
+            });
+            this.frameInput = this.indicesToRangeString(selectedIndices);
+        },
+
+        updateSelectedFrames() {
+            const indices = this.rangeStringToIndices(this.frameInput);
+            this.selectedFrames = this.generatedFrames.filter((_, index) => indices.includes(index + 1));
+
+            // Speichere die ursprünglichen Indizes
+            this.originalIndices = indices;
+
+            // Neue Nummerierung der ausgewählten Frames
+            this.getSelectedFrames = this.selectedFrames.map((frame, index) => ({
+                src: frame,
+                newIndex: index + 1
+            }));
+        },
+
+        updateHighlightFrameInput() {
+            const selectedIndices = this.highlightFrames.map(frame => {
+                return this.getSelectedFrames.indexOf(frame) + 1;
+            });
+            this.highlightInput = this.indicesToRangeString(selectedIndices);
+        },
+
+        updateHighlightFrames() {
+            const highlightIndices = this.rangeStringToIndices(this.highlightInput);
+            this.highlightFrames = this.getSelectedFrames.filter((_, index) => highlightIndices.includes(index + 1));
+
+            // Finde die Originalindizes der Highlight-Frames
+            this.originalHighlightIndices = highlightIndices.map(newIndex => this.originalIndices[newIndex - 1]);
+            console.log(this.originalHighlightIndices)
+        },
+
+        validateOpacity() {
+            this.opacityError = ''; // Setze die Fehlermeldung zurück
+            if (this.highlightOpacity !== null && (this.highlightOpacity < 0 || this.highlightOpacity > 1)) {
+                this.opacityError = 'Bitte geben Sie eine Zahl zwischen 0 und 1 für die Deckkraft ein.';
+            }
+        },
+
         async processSelectedFrames() {
+            this.validateOpacity(); // Validierung vor der Verarbeitung
+            if (this.opacityError) {
+                alert(this.opacityError);
+                return;
+            }
+
             try {
                 const formData = new FormData();
                 formData.append('projectName', this.projectName);
-                const highlightFrames = this.highlightFrames.split(',').map(Number);
 
-                //await Promise.all(this.selectedFrames.map(async (frame, index) => {
-                await Promise.all(this.generatedFrames.map(async (frame, index) => {
+                //const highlights = this.rangeStringToIndices(this.indicesToRangeString(this.originalHighlightIndices)); // Konvertiere zuerst in das Array von Zahlen
+                const highlights = this.highlightFrames.length > 0
+                    ? this.rangeStringToIndices(this.indicesToRangeString(this.originalHighlightIndices))
+                    : []; // Leeres Array, wenn keine Frames ausgewählt sind
+                const highlightString = highlights.join(', '); // Wandelt das Array in einen String mit Komma-Trennung um
+                const highlightFrames = highlightString.split(',').map(Number);
+
+                // Filtere die ausgewählten Frames aus den generierten Frames
+                const selectedFrames = this.selectedFrames.map(frame => this.generatedFrames.indexOf(frame));
+
+                await Promise.all(selectedFrames.map(async (index) => {
+                    const frame = this.generatedFrames[index];
                     const response = await fetch(frame);
+
                     const blob = await response.blob();
-                    formData.append('images', blob, `frame-${index}.png`);
+                    const fileName = frame.split('/').pop();
+                    formData.append('images', blob, fileName);
                 }));
 
                 formData.append('highlightFrames', JSON.stringify(highlightFrames)); // highlightFrames als JSON-String hinzufügen
-                formData.append('selectedFrames', JSON.stringify(this.selectedFrames.map(frame => this.generatedFrames.indexOf(frame) + 1))); // selectedFrames als JSON-String hinzufügen
+                formData.append('selectedFrames', JSON.stringify(selectedFrames.map(index => index + 1))); // selectedFrames als JSON-String hinzufügen
+
+                formData.append('highlightOpacity', this.highlightOpacity);
+
+                console.log('FormData Inhalt:', [...formData.entries()]);
 
                 const response = await fetch('/api/combine', {
                     method: 'POST',
@@ -123,6 +229,10 @@ new Vue({
                 const data = await response.json();
 
                 this.combinedImageUrl = data.imageUrl;
+
+                if (this.step < this.steps.length) {
+                    this.step++;
+                }
             } catch (error) {
                 console.error('Fehler beim Kombinieren der Bilder:', error);
             }
@@ -138,6 +248,7 @@ new Vue({
                 this.swiper = new Swiper('.swiper-container', {
                     slidesPerView: 3,
                     spaceBetween: 16,
+                    slidesPerGroup: 3,
                     pagination: {
                         el: '.swiper-pagination',
                         clickable: true,
@@ -151,6 +262,12 @@ new Vue({
         },
         selectedFrames() {
             this.updateFrameInput();
+        },
+        highlightFrames() {
+            if (this.highlightFrames.length === 0) {
+                this.highlightOpacity = null; // Setze auf null, wenn keine Frames ausgewählt sind
+            }
+            this.updateHighlightFrameInput();
         },
     },
 });

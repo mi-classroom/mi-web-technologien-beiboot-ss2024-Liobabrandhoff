@@ -14,7 +14,22 @@
         <h1>Bilder mit Langzeitbelichtung aus Videos erstellen</h1>
 
         <div id="app">
-            <div class="upload">
+            <!-- Step Indicator -->
+            <div class="step-indicator-container">
+                <div v-for="(stepName, index) in steps"
+                     :key="index"
+                     :class="['step-indicator', { active: step === (index + 1) }, { prevActive: step > (index + 1) }]">
+                    <div class="step-indicator-index">
+                        {{ (index +1) }}
+                    </div>
+                    <div class="step-indicator-stepname">
+                        {{ stepName }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1: Datei hochladen -->
+            <div v-if="step === 1" class="upload">
                 <input class="upload-input center" id="video-upload" type="file" @change="handleFileUpload" required>
                 <label for="video-upload" :class="{ 'file-uploaded': selectedFile }">
                     <span>{{ selectedFile ? selectedFile.name : 'Datei hochladen' }}</span>
@@ -29,38 +44,72 @@
                 <button @click="generate" class="submit center">Frames generieren</button>
             </div>
 
-            <div class="generated-frames-container" v-if="generatedFrames && generatedFrames.length > 0">
-                <h2>Generierte Frames:</h2>
-                <div class="swiper-container">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide" v-for="(frame, index) in generatedFrames" :key="index">
-                            <input class="frame-checkbox" type="checkbox" v-model="selectedFrames" :value="frame">
-                            <img class="frame" :src="frame" alt="Frame">
-                            <div class="frame-number">{{ index + 1 }}</div>
+            <!-- Step 2: Frames auswählen -->
+            <div v-if="step === 2">
+                <div class="generated-frames-container" v-if="generatedFrames && generatedFrames.length > 0">
+                    <h2>Generierte Frames:</h2>
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide" v-for="(frame, index) in generatedFrames" :key="index">
+                                <input class="frame-checkbox" type="checkbox" v-model="selectedFrames" :value="frame" @blur="updateSelectedFrames" @keypress.enter="updateSelectedFrames">
+                                <img class="frame" :src="frame" alt="Frame">
+                                <div class="frame-number">{{ index + 1 }}</div>
+                            </div>
                         </div>
+
+                        <div class="swiper-pagination"></div>
                     </div>
 
-                    <div class="swiper-pagination"></div>
+                    <div class="swiper-navigation">
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+
+                    <label class="selected-frames-label center" for="frame-input">Frames auswählen</label>
+                    <input class="selected-frames-input center" id="frame-input" type="text" v-model="frameInput" @blur="updateSelectedFrames" @keypress.enter="updateSelectedFrames">
+
+                    <button @click="nextStep" class="submit center">Weiter</button>
+
                 </div>
-
-                <div class="swiper-navigation">
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                </div>
-
-                <label class="selected-frames-label center" for="frame-input">Ausgewählte Frames</label>
-                <input class="selected-frames-input center" id="frame-input" type="text" v-model="frameInput" @blur="updateSelectedFrames" @keypress.enter="updateSelectedFrames">
-
-                <label class="highlight-frames-label center" for="highlight-frame-input">Highlight Frames</label>
-                <input class="highlight-frames-input center" id="highlight-frame-input" type="text" v-model="highlightFrames">
-
-                <button @click="processSelectedFrames" class="submit center" v-if="selectedFrames.length > 0">Kombiniertes Foto generieren</button>
-
             </div>
 
-            <div class="combined-image-container" v-if="combinedImageUrl">
-                <h2>Kombiniertes Bild:</h2>
-                <img class="combined-image center" :src="combinedImageUrl" alt="Kombiniertes Bild" width="300">
+            <!-- Step 3: Highlight Frames auswählen -->
+            <div v-if="step === 3">
+                <div class="selected-frames-container" v-if="getSelectedFrames.length > 0">
+                    <h2>Ausgewählte Frames:</h2>
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide" v-for="(frame, index) in getSelectedFrames" :key="index">
+                                <input class="frame-checkbox" type="checkbox" v-model="highlightFrames" :value="frame">
+                                <img class="frame" :src="frame.src" alt="Frame">
+                                <div class="frame-number">{{ frame.newIndex }}</div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+
+                    <div class="swiper-navigation">
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+
+                    <label class="highlight-frames-label center" for="highlight-frame-input">Frames zum Hervorheben auswählen</label>
+                    <input class="highlight-frames-input center" id="highlight-input" type="text" v-model="highlightInput" @blur="updateHighlightFrames" @keypress.enter="updateHighlightFrames">
+
+                    <label class="opacity-label center" for="highlight-opacity-input" v-if="highlightFrames.length > 0">Deckkraft des hervorzuhebenden Frames (Werte von 0-1)</label>
+                    <input class="opacity-input center" id="highlight-opacity-input" v-if="highlightFrames.length > 0" type="number" v-model="highlightOpacity" min="0" max="1" step="0.1">
+
+                    <button @click="processSelectedFrames" class="submit center">Kombiniertes Foto generieren</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Bild generieren -->
+            <div v-if="step === 4">
+                <div class="combined-image-container" v-if="combinedImageUrl">
+                    <h2>Kombiniertes Bild:</h2>
+                    <img class="combined-image center" :src="combinedImageUrl" alt="Kombiniertes Bild" width="300">
+                    <a :href="combinedImageUrl" class="submit center" :download="projectName + '_kombiniertes_bild.jpg'">Bild herunterladen</a>
+                </div>
             </div>
         </div>
 

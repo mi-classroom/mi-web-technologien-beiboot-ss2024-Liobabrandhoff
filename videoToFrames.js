@@ -8,13 +8,28 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
+//const upload = multer({ dest: 'uploads/' });
 
 router.use(express.json());
 
 // Erstelle den absoluten Pfad zum aktuellen Modul
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Setze Speicher-Optionen für multer, um die Originalnamen der Dateien beizubehalten
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Zielverzeichnis für die Dateien
+    },
+    filename: (req, file, cb) => {
+        // Behalte den Originalnamen der Datei bei
+        cb(null, file.originalname);
+    }
+});
+
+// Erstelle die multer-Instanz mit dem konfigurierten Speicher
+const upload = multer({ storage: storage });
+
 
 // Funktion zum Umbenennen der hochgeladenen Videodatei
 const renameVideoFile = async (file, projectName) => {
@@ -75,64 +90,39 @@ router.post('/generate', async (req, res) => {
 
 router.post('/combine', upload.array('images'), async (req, res) => {
     const files = req.files;
-    const { projectName, highlightFrames, selectedFrames } = req.body;
+    const { projectName, highlightFrames, selectedFrames, highlightOpacity } = req.body;
 
     const highlightFramesArray = JSON.parse(highlightFrames); // Parse the JSON string
     const selectedFramesArray = JSON.parse(selectedFrames); // Parse the JSON string
 
-    console.log('Highlight Frames Received:', highlightFramesArray); // Debugging-Information
-    console.log('Selected Frames Received:', selectedFramesArray); // Debugging-Information
-
     try {
         const highlightFramesSet = new Set(highlightFramesArray.map(Number));
-        const selectedFramesSet = new Set(selectedFramesArray.map(Number));
 
-        // Lade alle Bilder
         const loadedImages = await Promise.all(
-            files.map(file => Jimp.read(file.path))
+            files.map(async file => {
+                const image = await Jimp.read(file.path);
+                image.filePath = file.path; // Füge den ursprünglichen Pfad als Eigenschaft hinzu
+                return image;
+            })
         );
 
         // Erstelle das kombinierte Bild mit den Dimensionen des ersten Bildes
         let combinedImage = new Jimp(loadedImages[0].bitmap.width, loadedImages[0].bitmap.height);
 
         // Füge die ausgewählten Frames hinzu und setze die Opazität entsprechend
-        loadedImages.forEach((image, index) => {
-            const frameIndex = index + 1;
-            if (selectedFramesSet.has(frameIndex)) {
-                if (highlightFramesSet.has(frameIndex)) {
-                    console.log(frameIndex)
-                    combinedImage = combinedImage.composite(image.opacity(0.6), 0, 0);
-                } else {
-                    //const opacity = 1 / selectedFramesArray.length;
-                    //combinedImage = combinedImage.composite(image.opacity(opacity), 0, 0);
-                    combinedImage = combinedImage.composite(image.opacity(0.1), 0, 0);
-                }
+        loadedImages.forEach((image) => {
+            const imagePath = image.filePath;
+            const imageNr = imagePath.split('-')[1].split('.')[0];
+            // Entferne führende Nullen und wandle die Bildnummer in eine Zahl um
+            const imageNrAsNumber = parseInt(imageNr, 10);
+
+            if (highlightFramesSet.has(imageNrAsNumber)) {
+                combinedImage = combinedImage.composite(image.opacity(parseFloat(highlightOpacity)), 0, 0);
+            } else {
+                combinedImage = combinedImage.composite(image.opacity(0.1), 0, 0);
             }
+
         });
-
-
-        // Setze die Opazität jedes Bildes auf 5% und füge sie dem Array hinzu
-        //const images = loadedImages.map(image => image.opacity(0.05));
-
-        // Erstelle das kombinierte Bild
-        //let combinedImage = images.reduce((prev, current) => prev.composite(current, 0, 0), images.shift());
-
-        // Füge die hervorgehobenen Frames hinzu
-        /*for (let i = 0; i < loadedImages.length; i++) {
-            if (highlightFramesSet.has(i + 1)) {
-                combinedImage = combinedImage.composite(loadedImages[i].opacity(0.95), 0, 0); // Setze die Opazität auf 100%
-            }
-        }*/
-        /*for (let i = 0; i < highlightFramesSet.length; i++) {
-            if (highlightFramesSet.has(i + 1)) {
-                console.log(highlightFramesSet)
-                // Bild duplizieren und anpassen
-                let highlightedFrame = highlightFramesSet[i].clone().opacity(1);
-                console.log(highlightedFrame)
-                // Füge das hervorgehobene Bild dem kombinierten Bild hinzu
-                combinedImage = combinedImage.composite(highlightedFrame, 0, 0);
-            }
-        }*/
 
         // Speichere das kombinierte Bild
         const combinedImagePath = path.join(__dirname, 'frontend', 'combined-image', `${projectName}.png`);
