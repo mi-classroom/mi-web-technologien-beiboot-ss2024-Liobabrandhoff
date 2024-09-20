@@ -1,4 +1,4 @@
-# Image Editing Tools
+# Highlight Frames
 
 - Author: [Lioba Brandhoff](https://github.com/liobabrandhoff)
 - Date: 02.07.2024
@@ -16,11 +16,11 @@ Wie kann ein Nutzer ein oder mehrere Schlüsselbilder aus den einzelnen Frames a
 
 ## Decision
 
-Für die Auswahl des Nutzers habe ich mit Vue.js ein Input-Feld erstellt, in dem der Nutzer eine Eingabe machen kann, welche Bilder man highlighten möchte. Anhand dieser Eingabe werden dann die entsprechenden Frames mit einer höheren Opazität versehen (mit Jimp), als die anderen Bilder.
+Für die Auswahl der Frames habe ich mit Vue.js ein Input-Feld erstellt, in dem der Nutzer eine Eingabe machen kann, welche Bilder man highlighten möchte. Anhand dieser Eingabe werden dann die entsprechenden Frames mit einer höheren Opazität versehen (mit Jimp), als die anderen Bilder.
 
 ## Consequences
 
-Da ich keinen Zwischenschritt eingebaut habe, in dem erst die Auswahl der Frames generiert und dann erneut die Auswahl für die Highlights eingegeben und generiert wird, ist der Schritt für die Generierung des Endergebnisses deutlich langsamer geworden. Die Frames werden nun doppelt durchlaufen, da einmal wird, welche Frames überhaupt selektiert wurden und dann, ob sie noch hervorgehoben werden sollen. Dieser Prozess könnte möglicherweise noch optimiert werden.
+Da ich keinen Zwischenschritt eingebaut habe, in dem erst die Auswahl der Frames generiert und dann erneut die Auswahl für die Highlights eingegeben und generiert wird, ist der Schritt für die Generierung des Endergebnisses deutlich langsamer geworden. Die Frames werden nun doppelt durchlaufen, da einmal abgefragt wird, welche Frames überhaupt selektiert wurden und dann, ob sie noch hervorgehoben werden sollen. Dieser Prozess könnte möglicherweise noch optimiert werden. (Nachtrag: wurde optimiert - siehe [007-steps](007-steps.md))
 
 ## Pros and Cons of the Options
 

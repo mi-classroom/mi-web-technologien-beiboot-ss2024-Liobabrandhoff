@@ -21,6 +21,7 @@ Reviewer: [Jona Dielmann](https://github.com/jona-d01)
 
 # Projekt Dokumentation & Zeitaufwand
 
+Die Entscheidungen für die Verwendung der Technologien innerhalb dieses Projekts, sowie Zeitaufwände für die jeweiligen Issues, sind unter folgendem Link dokumentiert:
 [Architectural Decision Records](adr/README.md)
 
 

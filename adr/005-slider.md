@@ -1,4 +1,4 @@
-# Image Editing Tools
+# Slider
 
 - Author: [Lioba Brandhoff](https://github.com/liobabrandhoff)
 - Date: 04.06.2024
